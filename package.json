@@ -2,7 +2,7 @@
   "name": "gps-route",
   "version": "1.0.0",
   "scripts": {
-    "start": "vite",
+    "start": "vite --port 443",
     "build": "vite build",
     "serve": "vite preview"
   },
