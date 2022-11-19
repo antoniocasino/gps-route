@@ -25,10 +25,25 @@ const map = new Map({
 });
 
 const source = new VectorSource();
+const route = new VectorSource();
 const layer = new VectorLayer({
   source: source,
+  source: route
 });
 map.addLayer(layer);
+let positions = [];
+
+function drawLine(current,route){
+  positions.push(current);
+  if(positions.length>1){
+    const line = new ol.geom.LineString([positions.slice(positions.length-2), current]);
+    const feature = new ol.Feature({
+        geometry: line,
+        name: "Line"
+    });
+    route.addFeature(feature);
+  }  
+}
 
 navigator.geolocation.watchPosition(
   function (pos) {
@@ -41,6 +56,7 @@ navigator.geolocation.watchPosition(
       ),
       new Feature(new Point(fromLonLat(coords))),
     ]);
+    drawLine(coords);
   },
   function (error) {
     alert(`ERROR: ${error.message}`);
