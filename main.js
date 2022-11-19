@@ -59,8 +59,8 @@ navigator.geolocation.watchPosition(
       ),
       new Feature(new Point(fromLonLat(coords))),
     ]);*/
-    this.positions.push(coords);
-    drawFeatures(this.positions,source,accuracy);
+    positions.push(coords);
+    drawFeatures(positions,source,accuracy);
   },
   function (error) {
     alert(`ERROR: ${error.message}`);
