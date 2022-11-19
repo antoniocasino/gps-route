@@ -40,7 +40,7 @@ function drawLine(current,source,accuracy){
       new Feature(
         accuracy.transform('EPSG:4326', map.getView().getProjection())
       ),
-      new Feature(new Point(fromLonLat(coords))),
+      new Feature(new Point(fromLonLat(positions.length-1))),
       new Feature({
         geometry: line,
         name: "Line"
