@@ -32,35 +32,30 @@ const layer = new VectorLayer({
 map.addLayer(layer);
 let positions = [];
 
-function drawFeatures(positions,source,accuracy){
-  if(positions.length>1){
-    const line = new MultiLineString([new Point(fromLonLat(positions.slice(positions.length-2))), new Point(fromLonLat(positions.length-1))]);
-    source.addFeatures([
-      new Feature(
-        accuracy.transform('EPSG:4326', map.getView().getProjection())
-      ),
-      new Feature(new Point(fromLonLat(positions.length-1))),
-      new Feature({
-        geometry: line,
-        name: "polyline"
-      })
-    ]);
-  }  
-}
 
 navigator.geolocation.watchPosition(
   function (pos) {
     const coords = [pos.coords.longitude, pos.coords.latitude];
     const accuracy = circular(coords, pos.coords.accuracy);
-    //source.clear(true);
-    /*source.addFeatures([
-      new Feature(
-        accuracy.transform('EPSG:4326', map.getView().getProjection())
-      ),
-      new Feature(new Point(fromLonLat(coords))),
-    ]);*/
     positions.push(coords);
-    drawFeatures(positions,source,accuracy);
+    if(positions.length>1){
+      const line = new MultiLineString([new Point(fromLonLat(positions.slice(positions.length-2))), new Point(fromLonLat(positions.length-1))]);
+      let feature = source.getFeatures().filter(f=>f.name=="point");
+      source.removeFeature(feature);
+      source.addFeatures([
+        new Feature(
+          accuracy.transform('EPSG:4326', map.getView().getProjection())
+        ),
+        new Feature({
+          geometry:new Point(fromLonLat(positions.length-1)),
+          name:"point",
+        }),
+        new Feature({
+          geometry: line,
+          name: "polyline"
+        })
+      ]);
+    } 
   },
   function (error) {
     alert(`ERROR: ${error.message}`);
