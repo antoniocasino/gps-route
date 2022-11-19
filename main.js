@@ -26,23 +26,25 @@ const map = new Map({
 });
 
 const source = new VectorSource();
-const route = new VectorSource();
 const layer = new VectorLayer({
   source: source,
-  source: route
 });
 map.addLayer(layer);
 let positions = [];
 
-function drawLine(current,route){
+function drawLine(current,source,accuracy){
   positions.push(current);
   if(positions.length>1){
-    const line = new LineString([positions.slice(positions.length-2), current]);
-    const feature = new Feature({
+    const line = new LineString([new Point(fromLonLat(positions.slice(positions.length-2))), new Point(fromLonLat(positions.length-1))]);
+    source.addFeatures([
+      new Feature(
+        accuracy.transform('EPSG:4326', map.getView().getProjection())
+      ),
+      new Feature({
         geometry: line,
         name: "Line"
-    });
-    route.addFeatures([feature]);
+      })
+    ]);
   }  
 }
 
@@ -50,14 +52,14 @@ navigator.geolocation.watchPosition(
   function (pos) {
     const coords = [pos.coords.longitude, pos.coords.latitude];
     const accuracy = circular(coords, pos.coords.accuracy);
-    source.clear(true);
-    source.addFeatures([
+    //source.clear(true);
+    /*source.addFeatures([
       new Feature(
         accuracy.transform('EPSG:4326', map.getView().getProjection())
       ),
       new Feature(new Point(fromLonLat(coords))),
-    ]);
-    drawLine(coords,route);
+    ]);*/
+    drawLine(coords,source,accuracy);
   },
   function (error) {
     alert(`ERROR: ${error.message}`);
