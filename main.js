@@ -10,7 +10,7 @@ import {circular} from 'ol/geom/Polygon';
 import Control from 'ol/control/Control';
 import {Fill, Icon, Style} from 'ol/style';
 import kompas from 'kompas';
-import LineString from 'ol/geom/LineString';
+import MultiLineString from 'ol/geom/MultiLineString';
 
 const map = new Map({
   target: 'map-container',
@@ -34,7 +34,7 @@ let positions = [];
 
 function drawFeatures(positions,source,accuracy){
   if(positions.length>1){
-    const line = new LineString([new Point(fromLonLat(positions.slice(positions.length-2))), new Point(fromLonLat(positions.length-1))]);
+    const line = new MultiLineString([new Point(fromLonLat(positions.slice(positions.length-2))), new Point(fromLonLat(positions.length-1))]);
     source.addFeatures([
       new Feature(
         accuracy.transform('EPSG:4326', map.getView().getProjection())
@@ -42,7 +42,7 @@ function drawFeatures(positions,source,accuracy){
       new Feature(new Point(fromLonLat(positions.length-1))),
       new Feature({
         geometry: line,
-        name: "Line"
+        name: "polyline"
       })
     ]);
   }  
