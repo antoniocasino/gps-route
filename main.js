@@ -42,7 +42,7 @@ function drawLine(current,route){
         geometry: line,
         name: "Line"
     });
-    route.addFeature(feature);
+    route.addFeatures([feature]);
   }  
 }
 
@@ -57,7 +57,7 @@ navigator.geolocation.watchPosition(
       ),
       new Feature(new Point(fromLonLat(coords))),
     ]);
-    drawLine(coords);
+    drawLine(coords,route);
   },
   function (error) {
     alert(`ERROR: ${error.message}`);
