@@ -10,6 +10,7 @@ import {circular} from 'ol/geom/Polygon';
 import Control from 'ol/control/Control';
 import {Fill, Icon, Style} from 'ol/style';
 import kompas from 'kompas';
+import LineString from 'ol/geom/LineString';
 
 const map = new Map({
   target: 'map-container',
@@ -36,8 +37,8 @@ let positions = [];
 function drawLine(current,route){
   positions.push(current);
   if(positions.length>1){
-    const line = new ol.geom.LineString([positions.slice(positions.length-2), current]);
-    const feature = new ol.Feature({
+    const line = new LineString([positions.slice(positions.length-2), current]);
+    const feature = new Feature({
         geometry: line,
         name: "Line"
     });
