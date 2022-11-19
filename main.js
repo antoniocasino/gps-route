@@ -32,8 +32,7 @@ const layer = new VectorLayer({
 map.addLayer(layer);
 let positions = [];
 
-function drawLine(current,source,accuracy){
-  positions.push(current);
+function drawFeatures(positions,source,accuracy){
   if(positions.length>1){
     const line = new LineString([new Point(fromLonLat(positions.slice(positions.length-2))), new Point(fromLonLat(positions.length-1))]);
     source.addFeatures([
@@ -60,7 +59,8 @@ navigator.geolocation.watchPosition(
       ),
       new Feature(new Point(fromLonLat(coords))),
     ]);*/
-    drawLine(coords,source,accuracy);
+    this.positions.push(coords);
+    drawFeatures(this.positions,source,accuracy);
   },
   function (error) {
     alert(`ERROR: ${error.message}`);
