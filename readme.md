@@ -16,3 +16,5 @@ To generate a build ready for production:
     npm run build
 
 Then deploy the contents of the `dist` directory to your server.  You can also run `npm run serve` to serve the results of the `dist` directory for preview.
+
+Demo at [https://gps-route.herokuapp.com/](https://gps-route-production.up.railway.app/)
