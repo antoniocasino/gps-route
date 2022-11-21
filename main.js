@@ -44,7 +44,6 @@ navigator.geolocation.watchPosition(
     if(positions.length>1){     
       const line = new MultiLineString([new Point(fromLonLat(positions[positions.length-2])), new Point(fromLonLat(coords))]);
       let distance = distanceBetweenPoints(positions[positions.length-2],coords);
-      console.log("distance:",distance);
       timedDistance.push({distance:distance,time:moment()}); 
       let feature = source.getFeatures().filter(f=>f.name=="point");
       source.removeFeature(feature);
@@ -98,6 +97,10 @@ map.addControl(
 const stats = document.createElement('div');
 stats.className = 'ol-control ol-unselectable stats';
 stats.innerHTML = '<button title="Stats">Stats</button>';
+
+const statsContainer = document.createElement('div');
+statsContainer.className = 'ol-control ol-unselectable statsContainer';
+
 stats.addEventListener('click', function () {
   if (timedDistance.length>1) {
     let totalDistance = timedDistance.reduce((prev,curr)=> ({distance:prev.distance + curr.distance, time:curr.time}),{distance:0,time:moment().add(-2,"seconds")});
@@ -106,7 +109,7 @@ stats.addEventListener('click', function () {
       return 1000*el.distance/el.time.diff(arr[i-1].time,"milliseconds");
     });
     let avgSpeed = speeds.reduce((prev,curr)=> prev+curr,0)/speeds.length;
-    alert(`Total distance is: ${totalDistance.distance} meters /n Average speed is : ${avgSpeed}`);
+    statsContainer.innerHTML =`<span>Total distance is: ${totalDistance.distance} meters</span> <br/> <span>Average speed is : ${avgSpeed} m/s </span>`;
   }
 });
 map.addControl(
@@ -114,7 +117,11 @@ map.addControl(
     element: stats,
   })
 );
-
+map.addControl(
+  new Control({
+    element: statsContainer,
+  })
+);
 
 const style = new Style({
   fill: new Fill({
