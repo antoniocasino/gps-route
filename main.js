@@ -11,6 +11,7 @@ import Control from 'ol/control/Control';
 import {Fill, Icon, Style} from 'ol/style';
 import kompas from 'kompas';
 import MultiLineString from 'ol/geom/MultiLineString';
+import {getLength} from 'ol/sphere';
 
 const map = new Map({
   target: 'map-container',
@@ -31,15 +32,16 @@ const layer = new VectorLayer({
 });
 map.addLayer(layer);
 let positions = [];
-
+let timedDistance=[];
 
 navigator.geolocation.watchPosition(
   function (pos) {
     const coords = [pos.coords.longitude, pos.coords.latitude];
     const accuracy = circular(coords, pos.coords.accuracy);
-    positions.push(coords);
-    if(positions.length>1){
+    positions.push(coords);    
+    if(positions.length>1){     
       const line = new MultiLineString([new Point(fromLonLat(positions.slice(positions.length-2))), new Point(fromLonLat(positions.length-1))]);
+      timedDistance.push({distance:line.length,time:new Date()}); 
       let feature = source.getFeatures().filter(f=>f.name=="point");
       source.removeFeature(feature);
       source.addFeatures([
@@ -55,7 +57,9 @@ navigator.geolocation.watchPosition(
           name: "polyline"
         })
       ]);
-    } 
+    } else{
+      timedDistance.push({distance:0,time:new Date()}); 
+    }
   },
   function (error) {
     alert(`ERROR: ${error.message}`);
@@ -81,6 +85,26 @@ map.addControl(
     element: locate,
   })
 );
+const stats = document.createElement('div');
+stats.className = 'ol-control ol-unselectable stats';
+stats.innerHTML = '<button title="Stats">Stats</button>';
+stats.addEventListener('click', function () {
+  if (timedDistance.length>1) {
+    let totalDistance = timedDistance.reduce((prev,curr)=> prev.distance + curr.distance,0);
+    let speeds = timedDistance.map((el,i)=>{
+      if(i==0) return 0;
+      return el.distance/(Math.round(timedDistance[i-1].time-el.time)*1000000);
+    });
+    let avgSpeed = speeds.reduce((prev,curr)=> prev+curr,0)/speeds.length;
+    alert(`Total distance is: ${totalDistance} meters /n Average speed is : ${avgSpeed}`);
+  }
+});
+map.addControl(
+  new Control({
+    element: stats,
+  })
+);
+
 
 const style = new Style({
   fill: new Fill({
