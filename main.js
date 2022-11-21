@@ -41,7 +41,8 @@ navigator.geolocation.watchPosition(
     positions.push(coords);    
     if(positions.length>1){     
       const line = new MultiLineString([new Point(fromLonLat(positions.slice(positions.length-2))), new Point(fromLonLat(positions.length-1))]);
-      let distance = distanceBetweenPoints(positions.slice(positions.length-2),positions.slice(positions.length-1))
+      let distance = distanceBetweenPoints(positions.slice(positions.length-2),positions.slice(positions.length-1));
+      console.log("distance:",distance);
       timedDistance.push({distance:distance,time:new Date()}); 
       let feature = source.getFeatures().filter(f=>f.name=="point");
       source.removeFeature(feature);
@@ -71,7 +72,9 @@ navigator.geolocation.watchPosition(
 );
 
 function distanceBetweenPoints(point1, point2){
-  return squaredDistance(...point1,...point2);
+  const dx = point1[0] - point2[0];
+  const dy = point1[1] - point2[1];
+  return Math.sqrt(dx * dx + dy * dy);
 }
 
 const locate = document.createElement('div');
@@ -96,9 +99,9 @@ stats.innerHTML = '<button title="Stats">Stats</button>';
 stats.addEventListener('click', function () {
   if (timedDistance.length>1) {
     let totalDistance = timedDistance.reduce((prev,curr)=> prev.distance + curr.distance,0);
-    let speeds = timedDistance.map((el,i)=>{
+    let speeds = timedDistance.map((el,i,arr)=>{
       if(i==0) return 0;
-      return el.distance/(Math.round(timedDistance[i-1].time-el.time)*1000000);
+      return el/(Math.round(el[i-1]-el)*1000000);
     });
     let avgSpeed = speeds.reduce((prev,curr)=> prev+curr,0)/speeds.length;
     alert(`Total distance is: ${totalDistance} meters /n Average speed is : ${avgSpeed}`);
