@@ -46,7 +46,7 @@ navigator.geolocation.watchPosition(
       const line = new MultiLineString([new Point(fromLonLat(positions[positions.length-2])), new Point(fromLonLat(coords))]);
       let distance = distanceBetweenPoints(positions[positions.length-2],coords);
       console.log("distance:",distance);
-      timedDistance.push({distance:distance,time:new Date()}); 
+      timedDistance.push({distance:distance,time:moment()}); 
       let feature = source.getFeatures().filter(f=>f.name=="point");
       source.removeFeature(feature);
       source.addFeatures([
@@ -63,7 +63,7 @@ navigator.geolocation.watchPosition(
         })
       ]);
     } else{
-      timedDistance.push({distance:0,time:new Date()}); 
+      timedDistance.push({distance:0,time:moment()}); 
     }
   },
   function (error) {
@@ -101,10 +101,10 @@ stats.className = 'ol-control ol-unselectable stats';
 stats.innerHTML = '<button title="Stats">Stats</button>';
 stats.addEventListener('click', function () {
   if (timedDistance.length>1) {
-    let totalDistance = timedDistance.reduce((prev,curr)=> ({distance:prev.distance + curr.distance, time:curr.time}),0);
+    let totalDistance = timedDistance.reduce((prev,curr)=> ({distance:prev.distance + curr.distance, time:curr.time}),{distance:0,time:moment()});
     let speeds = timedDistance.map((el,i,arr)=>{
       if(i==0) return 0;
-      return el.distance/moment(el.time).seconds()-moment(arr[i-1].time).seconds();
+      return el.distance/el.time.diff(arr[i-1].time,"seconds");
     });
     let avgSpeed = speeds.reduce((prev,curr)=> prev+curr,0)/speeds.length;
     alert(`Total distance is: ${totalDistance.distance} meters /n Average speed is : ${avgSpeed}`);
@@ -120,12 +120,7 @@ map.addControl(
 const style = new Style({
   fill: new Fill({
     color: 'rgba(0, 0, 255, 0.2)',
-  }),
-  image: new Icon({
-    src: './data/location-heading.svg',
-    imgSize: [27, 55],
-    rotateWithView: true,
-  }),
+  })
 });
 layer.setStyle(style);
 
