@@ -12,6 +12,7 @@ import Control from 'ol/control/Control';
 import {Fill, Icon, Style} from 'ol/style';
 import kompas from 'kompas';
 import MultiLineString from 'ol/geom/MultiLineString';
+import moment from 'moment/moment';
 
 const map = new Map({
   target: 'map-container',
@@ -31,8 +32,10 @@ const layer = new VectorLayer({
   source: source,
 });
 map.addLayer(layer);
-let positions = [];
+let positions = [[45.8,8.6]];
 let timedDistance=[];
+
+navigator.geolocation.pos
 
 navigator.geolocation.watchPosition(
   function (pos) {
@@ -74,7 +77,6 @@ navigator.geolocation.watchPosition(
 function distanceBetweenPoints(point1, point2){
   const dx = point1[0] - point2[0];
   const dy = point1[1] - point2[1];
-  alert("distanceBetweenPoints",point1,point2);
   return Math.sqrt(dx * dx + dy * dy);
 }
 
@@ -99,13 +101,13 @@ stats.className = 'ol-control ol-unselectable stats';
 stats.innerHTML = '<button title="Stats">Stats</button>';
 stats.addEventListener('click', function () {
   if (timedDistance.length>1) {
-    let totalDistance = timedDistance.reduce((prev,curr)=> prev.distance + curr.distance,0);
+    let totalDistance = timedDistance.reduce((prev,curr)=> ({distance:prev.distance + curr.distance, time:curr.time}),0);
     let speeds = timedDistance.map((el,i,arr)=>{
       if(i==0) return 0;
-      return el/(Math.round(el[i-1]-el)*1000000);
+      return el.distance/moment(el.time).seconds()-moment(arr[i-1].time).seconds();
     });
     let avgSpeed = speeds.reduce((prev,curr)=> prev+curr,0)/speeds.length;
-    alert(`Total distance is: ${totalDistance} meters /n Average speed is : ${avgSpeed}`);
+    alert(`Total distance is: ${totalDistance.distance} meters /n Average speed is : ${avgSpeed}`);
   }
 });
 map.addControl(
