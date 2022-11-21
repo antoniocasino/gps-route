@@ -103,7 +103,7 @@ stats.addEventListener('click', function () {
     let totalDistance = timedDistance.reduce((prev,curr)=> ({distance:prev.distance + curr.distance, time:curr.time}),{distance:0,time:moment().add(-2,"seconds")});
     let speeds = timedDistance.map((el,i,arr)=>{
       if(i==0) return 0;
-      return el.distance/el.time.diff(arr[i-1].time,"seconds");
+      return 1000*el.distance/el.time.diff(arr[i-1].time,"milliseconds");
     });
     let avgSpeed = speeds.reduce((prev,curr)=> prev+curr,0)/speeds.length;
     alert(`Total distance is: ${totalDistance.distance} meters /n Average speed is : ${avgSpeed}`);
