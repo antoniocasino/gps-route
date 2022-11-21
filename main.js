@@ -6,7 +6,6 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
-import {squaredDistance} from "ol/math"
 import {circular} from 'ol/geom/Polygon';
 import Control from 'ol/control/Control';
 import {Fill, Icon, Style} from 'ol/style';
@@ -32,7 +31,7 @@ const layer = new VectorLayer({
   source: source,
 });
 map.addLayer(layer);
-let positions = [[45.8,8.6]];
+let positions = [];
 let timedDistance=[];
 
 navigator.geolocation.pos
@@ -53,10 +52,10 @@ navigator.geolocation.watchPosition(
         new Feature(
           accuracy.transform('EPSG:4326', map.getView().getProjection())
         ),
-        new Feature({
+        /*new Feature({
           geometry:new Point(fromLonLat(positions.length-1)),
           name:"point",
-        }),
+        }),*/
         new Feature({
           geometry: line,
           name: "polyline"
@@ -101,7 +100,7 @@ stats.className = 'ol-control ol-unselectable stats';
 stats.innerHTML = '<button title="Stats">Stats</button>';
 stats.addEventListener('click', function () {
   if (timedDistance.length>1) {
-    let totalDistance = timedDistance.reduce((prev,curr)=> ({distance:prev.distance + curr.distance, time:curr.time}),{distance:0,time:moment()});
+    let totalDistance = timedDistance.reduce((prev,curr)=> ({distance:prev.distance + curr.distance, time:curr.time}),{distance:0,time:moment().add(-2,"seconds")});
     let speeds = timedDistance.map((el,i,arr)=>{
       if(i==0) return 0;
       return el.distance/el.time.diff(arr[i-1].time,"seconds");
