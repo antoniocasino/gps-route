@@ -6,12 +6,12 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
+import {squaredDistance} from "ol/math"
 import {circular} from 'ol/geom/Polygon';
 import Control from 'ol/control/Control';
 import {Fill, Icon, Style} from 'ol/style';
 import kompas from 'kompas';
 import MultiLineString from 'ol/geom/MultiLineString';
-import {getLength} from 'ol/sphere';
 
 const map = new Map({
   target: 'map-container',
@@ -41,7 +41,8 @@ navigator.geolocation.watchPosition(
     positions.push(coords);    
     if(positions.length>1){     
       const line = new MultiLineString([new Point(fromLonLat(positions.slice(positions.length-2))), new Point(fromLonLat(positions.length-1))]);
-      timedDistance.push({distance:line.length,time:new Date()}); 
+      let distance = distanceBetweenPoints(positions.slice(positions.length-2),positions.slice(positions.length-1))
+      timedDistance.push({distance:distance,time:new Date()}); 
       let feature = source.getFeatures().filter(f=>f.name=="point");
       source.removeFeature(feature);
       source.addFeatures([
@@ -68,6 +69,10 @@ navigator.geolocation.watchPosition(
     enableHighAccuracy: true,
   }
 );
+
+function distanceBetweenPoints(point1, point2){
+  return squaredDistance(...point1,...point2);
+}
 
 const locate = document.createElement('div');
 locate.className = 'ol-control ol-unselectable locate';
