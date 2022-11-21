@@ -40,8 +40,8 @@ navigator.geolocation.watchPosition(
     const accuracy = circular(coords, pos.coords.accuracy);
     positions.push(coords);    
     if(positions.length>1){     
-      const line = new MultiLineString([new Point(fromLonLat(positions.slice(positions.length-2))), new Point(fromLonLat(positions.length-1))]);
-      let distance = distanceBetweenPoints(positions.slice(positions.length-2),positions.slice(positions.length-1));
+      const line = new MultiLineString([new Point(fromLonLat(positions[positions.length-2])), new Point(fromLonLat(coords))]);
+      let distance = distanceBetweenPoints(positions[positions.length-2],coords);
       console.log("distance:",distance);
       timedDistance.push({distance:distance,time:new Date()}); 
       let feature = source.getFeatures().filter(f=>f.name=="point");
@@ -74,6 +74,7 @@ navigator.geolocation.watchPosition(
 function distanceBetweenPoints(point1, point2){
   const dx = point1[0] - point2[0];
   const dy = point1[1] - point2[1];
+  alert.log("distanceBetweenPoints",point1,point2);
   return Math.sqrt(dx * dx + dy * dy);
 }
 
